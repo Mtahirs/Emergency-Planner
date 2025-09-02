@@ -1,0 +1,5 @@
+{
+  "name": "Emergency Fund Planner",
+  "description": "A personalized financial planning tool to help you build a robust financial safety net. Answer a few questions about your finances, risk factors, and personal situation to receive a tailored recommendation for your emergency fund target and an actionable plan to achieve your goal.",
+  "requestFramePermissions": []
+}
