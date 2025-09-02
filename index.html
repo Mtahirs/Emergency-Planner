@@ -11,21 +11,461 @@
       }
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     </style>
+    <!-- React and ReactDOM from CDN (production versions) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <!-- Babel Standalone for in-browser JSX transpilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script type="importmap">
 {
   "imports": {
+    "react": "https://aistudiocdn.com/react@^19.1.1",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
-    "react/": "https://aistudiocdn.com/react@^19.1.1/",
-    "react": "https://aistudiocdn.com/react@^19.1.1"
+    "react/": "https://aistudiocdn.com/react@^19.1.1/"
   }
 }
 </script>
-<!-- Add Babel Standalone for in-browser JSX transpilation -->
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
   <body class="bg-slate-50">
     <div id="root"></div>
-    <!-- Update script tag to use Babel and a relative path -->
-    <script type="text/babel" data-type="module" src="./index.tsx"></script>
+    <script type="text/babel">
+      const { useState, useMemo, useRef, useEffect, StrictMode } = React;
+
+      // --- From components/Icons.tsx ---
+      const DollarSignIcon = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <line x1="12" y1="2" x2="12" y2="22" />
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+      );
+      const AlertTriangleIcon = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      );
+      const TargetIcon = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <circle cx="12" cy="12" r="10" />
+          <circle cx="12" cy="12" r="6" />
+          <circle cx="12" cy="12" r="2" />
+        </svg>
+      );
+      const TrendingUpIcon = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+          <polyline points="16 7 22 7 22 13" />
+        </svg>
+      );
+      const CheckCircleIcon = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      );
+      const SearchIcon = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      );
+      const ChevronDownIcon = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      );
+
+      // --- From constants.tsx ---
+      const ALL_CURRENCIES = [
+        { value: 'AFN', label: 'Afghan Afghani', symbol: '؋' }, { value: 'ALL', label: 'Albanian Lek', symbol: 'L' }, { value: 'DZD', label: 'Algerian Dinar', symbol: 'د.ج' }, { value: 'AOA', label: 'Angolan Kwanza', symbol: 'Kz' }, { value: 'ARS', label: 'Argentine Peso', symbol: '$' }, { value: 'AMD', label: 'Armenian Dram', symbol: '֏' }, { value: 'AWG', label: 'Aruban Florin', symbol: 'ƒ' }, { value: 'AUD', label: 'Australian Dollar', symbol: '$' }, { value: 'AZN', label: 'Azerbaijani Manat', symbol: '₼' }, { value: 'BSD', label: 'Bahamian Dollar', symbol: '$' }, { value: 'BHD', label: 'Bahraini Dinar', symbol: '.د.ب' }, { value: 'BDT', label: 'Bangladeshi Taka', symbol: '৳' }, { value: 'BBD', label: 'Barbadian Dollar', symbol: '$' }, { value: 'BYN', label: 'Belarusian Ruble', symbol: 'Br' }, { value: 'BZD', label: 'Belize Dollar', symbol: 'BZ$' }, { value: 'BMD', label: 'Bermudian Dollar', symbol: '$' }, { value: 'BTN', label: 'Bhutanese Ngultrum', symbol: 'Nu.' }, { value: 'BOB', label: 'Bolivian Boliviano', symbol: 'Bs.' }, { value: 'BAM', label: 'Bosnia-Herzegovina Convertible Mark', symbol: 'KM' }, { value: 'BWP', label: 'Botswanan Pula', symbol: 'P' }, { value: 'BRL', label: 'Brazilian Real', symbol: 'R$' }, { value: 'GBP', label: 'British Pound Sterling', symbol: '£' }, { value: 'BND', label: 'Brunei Dollar', symbol: '$' }, { value: 'BGN', label: 'Bulgarian Lev', symbol: 'лв' }, { value: 'BIF', label: 'Burundian Franc', symbol: 'FBu' }, { value: 'KHR', label: 'Cambodian Riel', symbol: '៛' }, { value: 'CAD', label: 'Canadian Dollar', symbol: '$' }, { value: 'CVE', label: 'Cape Verdean Escudo', symbol: '$' }, { value: 'KYD', label: 'Cayman Islands Dollar', symbol: '$' }, { value: 'XAF', label: 'Central African CFA Franc', symbol: 'FCFA' }, { value: 'XPF', label: 'CFP Franc', symbol: '₣' }, { value: 'CLP', label: 'Chilean Peso', symbol: '$' }, { value: 'CNY', label: 'Chinese Yuan', symbol: '¥' }, { value: 'COP', label: 'Colombian Peso', symbol: '$' }, { value: 'KMF', label: 'Comorian Franc', symbol: 'CF' }, { value: 'CDF', label: 'Congolese Franc', symbol: 'FC' }, { value: 'CRC', label: 'Costa Rican Colón', symbol: '₡' }, { value: 'HRK', label: 'Croatian Kuna', symbol: 'kn' }, { value: 'CUP', label: 'Cuban Peso', symbol: '$' }, { value: 'CZK', label: 'Czech Koruna', symbol: 'Kč' }, { value: 'DKK', label: 'Danish Krone', symbol: 'kr' }, { value: 'DJF', label: 'Djiboutian Franc', symbol: 'Fdj' }, { value: 'DOP', label: 'Dominican Peso', symbol: 'RD$' }, { value: 'XCD', label: 'East Caribbean Dollar', symbol: '$' }, { value: 'EGP', label: 'Egyptian Pound', symbol: '£' }, { value: 'ERN', label: 'Eritrean Nakfa', symbol: 'Nfk' }, { value: 'ETB', label: 'Ethiopian Birr', symbol: 'Br' }, { value: 'EUR', label: 'Euro', symbol: '€' }, { value: 'FKP', label: 'Falkland Islands Pound', symbol: '£' }, { value: 'FJD', label: 'Fijian Dollar', symbol: '$' }, { value: 'GMD', label: 'Gambian Dalasi', symbol: 'D' }, { value: 'GEL', label: 'Georgian Lari', symbol: '₾' }, { value: 'GHS', label: 'Ghanaian Cedi', symbol: 'GH₵' }, { value: 'GIP', label: 'Gibraltar Pound', symbol: '£' }, { value: 'GTQ', label: 'Guatemalan Quetzal', symbol: 'Q' }, { value: 'GNF', label: 'Guinean Franc', symbol: 'FG' }, { value: 'GYD', label: 'Guyanaese Dollar', symbol: '$' }, { value: 'HTG', label: 'Haitian Gourde', symbol: 'G' }, { value: 'HNL', label: 'Honduran Lempira', symbol: 'L' }, { value: 'HKD', label: 'Hong Kong Dollar', symbol: '$' }, { value: 'HUF', label: 'Hungarian Forint', symbol: 'Ft' }, { value: 'ISK', label: 'Icelandic Króna', symbol: 'kr' }, { value: 'INR', label: 'Indian Rupee', symbol: '₹' }, { value: 'IDR', label: 'Indonesian Rupiah', symbol: 'Rp' }, { value: 'IRR', label: 'Iranian Rial', symbol: '﷼' }, { value: 'IQD', label: 'Iraqi Dinar', symbol: 'ع.د' }, { value: 'ILS', label: 'Israeli New Shekel', symbol: '₪' }, { value: 'JMD', label: 'Jamaican Dollar', symbol: 'J$' }, { value: 'JPY', label: 'Japanese Yen', symbol: '¥' }, { value: 'JOD', label: 'Jordanian Dinar', symbol: 'JD' }, { value: 'KZT', label: 'Kazakhstani Tenge', symbol: '₸' }, { value: 'KES', label: 'Kenyan Shilling', symbol: 'KSh' }, { value: 'KWD', label: 'Kuwaiti Dinar', symbol: 'د.ك' }, { value: 'KGS', label: 'Kyrgystani Som', symbol: 'с' }, { value: 'LAK', label: 'Laotian Kip', symbol: '₭' }, { value: 'LBP', label: 'Lebanese Pound', symbol: '£' }, { value: 'LSL', label: 'Lesotho Loti', symbol: 'L' }, { value: 'LRD', label: 'Liberian Dollar', symbol: '$' }, { value: 'LYD', label: 'Libyan Dinar', symbol: 'ل.د' }, { value: 'MOP', label: 'Macanese Pataca', symbol: 'MOP$' }, { value: 'MKD', label: 'Macedonian Denar', symbol: 'ден' }, { value: 'MGA', label: 'Malagasy Ariary', symbol: 'Ar' }, { value: 'MWK', label: 'Malawian Kwacha', symbol: 'MK' }, { value: 'MYR', label: 'Malaysian Ringgit', symbol: 'RM' }, { value: 'MVR', label: 'Maldivian Rufiyaa', symbol: 'Rf' }, { value: 'MRU', label: 'Mauritanian Ouguiya', symbol: 'UM' }, { value: 'MUR', label: 'Mauritian Rupee', symbol: '₨' }, { value: 'MXN', label: 'Mexican Peso', symbol: '$' }, { value: 'MDL', label: 'Moldovan Leu', symbol: 'L' }, { value: 'MNT', label: 'Mongolian Tugrik', symbol: '₮' }, { value: 'MAD', label: 'Moroccan Dirham', symbol: 'د.م.' }, { value: 'MZN', label: 'Mozambican Metical', symbol: 'MT' }, { value: 'MMK', label: 'Myanmar Kyat', symbol: 'K' }, { value: 'NAD', label: 'Namibian Dollar', symbol: '$' }, { value: 'NPR', label: 'Nepalese Rupee', symbol: '₨' }, { value: 'ANG', label: 'Netherlands Antillean Guilder', symbol: 'ƒ' }, { value: 'TWD', label: 'New Taiwan Dollar', symbol: 'NT$' }, { value: 'NZD', label: 'New Zealand Dollar', symbol: '$' }, { value: 'NIO', label: 'Nicaraguan Córdoba', symbol: 'C$' }, { value: 'NGN', label: 'Nigerian Naira', symbol: '₦' }, { value: 'KPW', label: 'North Korean Won', symbol: '₩' }, { value: 'NOK', label: 'Norwegian Krone', symbol: 'kr' }, { value: 'OMR', label: 'Omani Rial', symbol: 'ر.ع.' }, { value: 'PKR', label: 'Pakistani Rupee', symbol: '₨' }, { value: 'PAB', label: 'Panamanian Balboa', symbol: 'B/.' }, { value: 'PGK', label: 'Papua New Guinean Kina', symbol: 'K' }, { value: 'PYG', label: 'Paraguayan Guarani', symbol: '₲' }, { value: 'PEN', label: 'Peruvian Sol', symbol: 'S/.' }, { value: 'PHP', label: 'Philippine Peso', symbol: '₱' }, { value: 'PLN', label: 'Polish Zloty', symbol: 'zł' }, { value: 'QAR', label: 'Qatari Rial', symbol: 'ر.ق' }, { value: 'RON', label: 'Romanian Leu', symbol: 'lei' }, { value: 'RUB', label: 'Russian Ruble', symbol: '₽' }, { value: 'RWF', label: 'Rwandan Franc', symbol: 'R₣' }, { value: 'SHP', label: 'Saint Helena Pound', symbol: '£' }, { value: 'SVC', label: 'Salvadoran Colón', symbol: '$' }, { value: 'SAR', label: 'Saudi Riyal', symbol: 'ر.س' }, { value: 'RSD', label: 'Serbian Dinar', symbol: 'Дин.' }, { value: 'SCR', label: 'Seychellois Rupee', symbol: '₨' }, { value: 'SLL', label: 'Sierra Leonean Leone', symbol: 'Le' }, { value: 'SGD', label: 'Singapore Dollar', symbol: '$' }, { value: 'SBD', label: 'Solomon Islands Dollar', symbol: '$' }, { value: 'SOS', label: 'Somali Shilling', symbol: 'S' }, { value: 'ZAR', label: 'South African Rand', symbol: 'R' }, { value: 'KRW', label: 'South Korean Won', symbol: '₩' }, { value: 'SSP', label: 'South Sudanese Pound', symbol: '£' }, { value: 'LKR', label: 'Sri Lankan Rupee', symbol: 'Rs' }, { value: 'SDG', label: 'Sudanese Pound', symbol: 'ج.س.' }, { value: 'SRD', label: 'Surinamese Dollar', symbol: '$' }, { value: 'SZL', label: 'Swazi Lilangeni', symbol: 'L' }, { value: 'SEK', label: 'Swedish Krona', symbol: 'kr' }, { value: 'CHF', label: 'Swiss Franc', symbol: 'CHF' }, { value: 'SYP', label: 'Syrian Pound', symbol: '£' }, { value: 'TJS', label: 'Tajikistani Somoni', symbol: 'SM' }, { value: 'TZS', label: 'Tanzanian Shilling', symbol: 'TSh' }, { value: 'THB', label: 'Thai Baht', symbol: '฿' }, { value: 'TOP', label: "Tongan Pa'anga", symbol: 'T$' }, { value: 'TTD', label: 'Trinidad and Tobago Dollar', symbol: 'TT$' }, { value: 'TND', label: 'Tunisian Dinar', symbol: 'د.ت' }, { value: 'TRY', label: 'Turkish Lira', symbol: '₺' }, { value: 'TMT', label: 'Turkmenistani Manat', symbol: 'T' }, { value: 'UGX', label: 'Ugandan Shilling', symbol: 'USh' }, { value: 'UAH', label: 'Ukrainian Hryvnia', symbol: '₴' }, { value: 'AED', label: 'United Arab Emirates Dirham', symbol: 'د.إ' }, { value: 'USD', label: 'United States Dollar', symbol: '$' }, { value: 'UYU', label: 'Uruguayan Peso', symbol: '$U' }, { value: 'UZS', label: 'Uzbekistan Som', symbol: 'soʻm' }, { value: 'VUV', label: 'Vanuatu Vatu', symbol: 'VT' }, { value: 'VEF', label: 'Venezuelan Bolívar', symbol: 'Bs F' }, { value: 'VND', label: 'Vietnamese Dong', symbol: '₫' }, { value: 'XOF', label: 'West African CFA Franc', symbol: 'CFA' }, { value: 'YER', label: 'Yemeni Rial', symbol: '﷼' }, { value: 'ZMW', label: 'Zambian Kwacha', symbol: 'ZK' },
+      ].sort((a, b) => a.label.localeCompare(b.label));
+
+      const INITIAL_FORM_DATA = {
+        currency: 'USD', monthlyEssentials: '', monthlyIncome: '', currentSavings: '', monthlyDiscretionary: '', jobStability: '', incomeStreams: '', healthInsurance: '', housingStatus: '', dependents: '', mainConcerns: [], jobSearchTime: '', familySupport: '', assetCondition: '', monthlySavingsCapacity: '', storagePreference: '', savingsApproach: ''
+      };
+
+      const STEPS = [
+        {
+          title: "Basic Financial Picture",
+          icon: <DollarSignIcon className="w-6 h-6 text-indigo-600" />,
+          questions: [
+            { key: 'currency', label: 'Select Your Currency', type: 'select', options: ALL_CURRENCIES.map(({ value, label }) => ({ value, label })) },
+            { key: 'monthlyEssentials', label: 'Monthly Essential Expenses', type: 'number', placeholder: '2500', help: 'Housing, utilities, food, transportation, minimum debt payments' },
+            { key: 'monthlyIncome', label: 'Monthly Household Income (after taxes)', type: 'number', placeholder: '4000' },
+            { key: 'currentSavings', label: 'Current Emergency Savings', type: 'number', placeholder: '500' },
+            { key: 'monthlyDiscretionary', label: 'Monthly Discretionary Spending', type: 'number', placeholder: '800', help: 'Dining out, entertainment, hobbies, non-essential shopping' }
+          ]
+        },
+        {
+          title: "Risk Assessment",
+          icon: <AlertTriangleIcon className="w-6 h-6 text-indigo-600" />,
+          questions: [
+            { key: 'jobStability', label: 'How stable is your employment?', type: 'select', options: [{ value: 'very-stable', label: 'Very stable (tenured, government, essential services)' }, { value: 'somewhat-stable', label: 'Somewhat stable (permanent position, established company)' }, { value: 'unstable', label: 'Unstable (contract, gig work, volatile industry)' }] },
+            { key: 'incomeStreams', label: 'Income sources', type: 'select', options: [{ value: 'single', label: 'Single income source' }, { value: 'dual', label: 'Dual income household' }, { value: 'multiple', label: 'Multiple income streams' }] },
+            { key: 'healthInsurance', label: 'Health insurance situation', type: 'select', options: [{ value: 'excellent', label: 'Excellent coverage, low deductibles' }, { value: 'good', label: 'Good coverage, moderate deductibles' }, { value: 'basic', label: 'Basic coverage, high deductibles' }, { value: 'none', label: 'No health insurance' }] },
+            { key: 'housingStatus', label: 'Housing situation', type: 'select', options: [{ value: 'own', label: 'Own home (responsible for repairs)' }, { value: 'rent', label: 'Rent (landlord handles major repairs)' }] },
+            { key: 'dependents', label: 'Number of dependents', type: 'select', options: [{ value: '0', label: 'No dependents' }, { value: '1', label: '1 dependent' }, { value: '2', label: '2 dependents' }, { value: '3+', label: '3 or more dependents' }] }
+          ]
+        },
+        {
+          title: "Scenario Planning",
+          icon: <TargetIcon className="w-6 h-6 text-indigo-600" />,
+          questions: [
+            { key: 'mainConcerns', label: 'What emergencies worry you most? (Select all that apply)', type: 'checkbox', options: [{ value: 'job-loss', label: 'Job loss or income reduction' }, { value: 'medical', label: 'Medical emergencies or health issues' }, { value: 'home-repair', label: 'Major home repairs' }, { value: 'car-repair', label: 'Vehicle repairs or replacement' }, { value: 'family', label: 'Family emergencies requiring travel/support' }] },
+            { key: 'jobSearchTime', label: 'If you lost your job, how long to find comparable work?', type: 'select', options: [{ value: '1-2', label: '1-2 months' }, { value: '3-4', label: '3-4 months' }, { value: '5-6', label: '5-6 months' }, { value: '6+', label: 'More than 6 months' }] },
+            { key: 'familySupport', label: 'Family financial support availability', type: 'select', options: [{ value: 'strong', label: 'Strong (could help with major expenses)' }, { value: 'limited', label: 'Limited (could help with small amounts)' }, { value: 'none', label: 'None available' }] },
+            { key: 'assetCondition', label: 'Condition of major assets (car, home, appliances)', type: 'select', options: [{ value: 'excellent', label: 'Excellent (new/recently replaced)' }, { value: 'good', label: 'Good condition' }, { value: 'fair', label: 'Fair (some items aging)' }, { value: 'poor', label: 'Poor (multiple items need replacement soon)' }] }
+          ]
+        },
+        {
+          title: "Implementation Strategy",
+          icon: <TrendingUpIcon className="w-6 h-6 text-indigo-600" />,
+          questions: [
+            { key: 'monthlySavingsCapacity', label: 'How much can you realistically save per month?', type: 'number', placeholder: '300', help: 'Be honest - what amount won\'t make you miserable?' },
+            { key: 'storagePreference', label: 'Where would you prefer to keep emergency funds?', type: 'select', options: [{ value: 'checking', label: 'Checking account (immediate access)' }, { value: 'savings', label: 'High-yield savings account (best balance)' }, { value: 'money-market', label: 'Money market account (higher yield, some restrictions)' }] },
+            { key: 'savingsApproach', label: 'Preferred savings approach', type: 'select', options: [{ value: 'gradual', label: 'Steady monthly contributions' }, { value: 'aggressive', label: 'Aggressive savings, then maintain' }, { value: 'windfall', label: 'Rely mainly on bonuses/tax refunds' }] }
+          ]
+        }
+      ];
+
+      // --- From components/ProgressBar.tsx ---
+      const ProgressBar = ({ currentStep, totalSteps }) => {
+        const percentage = ((currentStep + 1) / totalSteps) * 100;
+        return (
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-slate-700">Step {currentStep + 1} of {totalSteps}</span>
+              <span className="text-sm font-medium text-indigo-600">{Math.round(percentage)}% Complete</span>
+            </div>
+            <div className="w-full bg-slate-200 rounded-full h-2.5">
+              <div className="bg-indigo-600 h-2.5 rounded-full transition-all duration-500 ease-out" style={{ width: `${percentage}%` }}></div>
+            </div>
+          </div>
+        );
+      };
+
+      // --- From components/CurrencySelector.tsx ---
+      const CurrencySelector = ({ value, onChange }) => {
+        const [isOpen, setIsOpen] = useState(false);
+        const [query, setQuery] = useState('');
+        const selectorRef = useRef(null);
+
+        const selectedCurrency = useMemo(() => {
+          return ALL_CURRENCIES.find(c => c.value === value) || ALL_CURRENCIES.find(c => c.value === 'USD');
+        }, [value]);
+
+        const filteredCurrencies = useMemo(() => {
+          if (!query) return ALL_CURRENCIES;
+          const lowerCaseQuery = query.toLowerCase();
+          return ALL_CURRENCIES.filter(
+            currency => currency.label.toLowerCase().includes(lowerCaseQuery) || currency.value.toLowerCase().includes(lowerCaseQuery)
+          );
+        }, [query]);
+
+        const handleSelect = (currencyCode) => {
+          onChange(currencyCode);
+          setQuery('');
+          setIsOpen(false);
+        };
+
+        useEffect(() => {
+          const handleClickOutside = (event) => {
+            if (selectorRef.current && !selectorRef.current.contains(event.target)) {
+              setIsOpen(false);
+              setQuery('');
+            }
+          };
+          document.addEventListener('mousedown', handleClickOutside);
+          return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+          };
+        }, []);
+
+        return (
+          <div className="relative" ref={selectorRef}>
+            <button type="button" className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white flex justify-between items-center text-left" onClick={() => setIsOpen(!isOpen)}>
+              <span>{selectedCurrency.label} ({selectedCurrency.value})</span>
+              <ChevronDownIcon className={`w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isOpen && (
+              <div className="absolute z-10 top-full mt-2 w-full bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-hidden flex flex-col">
+                <div className="p-2 border-b border-slate-200">
+                  <div className="relative">
+                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input type="text" placeholder="Search currency..." className="w-full pl-9 pr-3 py-1.5 border border-slate-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" value={query} onChange={e => setQuery(e.target.value)} autoFocus />
+                  </div>
+                </div>
+                <ul className="overflow-y-auto flex-1">
+                  {filteredCurrencies.length > 0 ? (
+                    filteredCurrencies.map(currency => (
+                      <li key={currency.value} className={`px-4 py-2 cursor-pointer hover:bg-indigo-50 ${value === currency.value ? 'bg-indigo-100' : ''}`} onClick={() => handleSelect(currency.value)}>
+                        {currency.label} <span className="text-slate-500">({currency.value})</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="px-4 py-2 text-slate-500">No results found</li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      // --- From components/QuestionRenderer.tsx ---
+      const getCurrencySymbol = (currencyCode) => {
+          const currency = ALL_CURRENCIES.find(c => c.value === currencyCode);
+          return currency ? currency.symbol : '$';
+      };
+      const formatNumberInput = (value) => {
+          if (!value) return '';
+          const parts = value.split('.');
+          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          return parts.join('.');
+      };
+      const parseNumberInput = (value) => value.replace(/,/g, '');
+
+      const QuestionRenderer = ({ question, formData, updateField, updateArrayField }) => {
+        const value = formData[question.key];
+        switch (question.type) {
+          case 'number': {
+            const currencySymbol = getCurrencySymbol(formData.currency);
+            return (
+              <div>
+                <label htmlFor={question.key} className="block text-sm font-medium text-slate-700 mb-2">{question.label}</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">{currencySymbol}</span>
+                  <input id={question.key} type="text" inputMode="decimal" className="w-full pl-7 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder={question.placeholder} value={formatNumberInput(value)} onChange={(e) => {
+                    const parsedValue = parseNumberInput(e.target.value);
+                    if (/^\d*\.?\d*$/.test(parsedValue)) {
+                      updateField(question.key, parsedValue);
+                    }
+                  }} />
+                </div>
+                {question.help && (<p className="text-xs text-slate-500 mt-1.5">{question.help}</p>)}
+              </div>
+            );
+          }
+          case 'select':
+            if (question.key === 'currency') {
+              return (
+                <div>
+                  <label htmlFor={question.key} className="block text-sm font-medium text-slate-700 mb-2">{question.label}</label>
+                  <CurrencySelector value={value} onChange={(newValue) => updateField('currency', newValue)} />
+                </div>
+              )
+            }
+            return (
+              <div>
+                <label htmlFor={question.key} className="block text-sm font-medium text-slate-700 mb-2">{question.label}</label>
+                <select id={question.key} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white" value={value} onChange={(e) => updateField(question.key, e.target.value)}>
+                  <option value="">Select an option...</option>
+                  {question.options?.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+            );
+          case 'checkbox':
+            return (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-3">{question.label}</label>
+                <div className="space-y-2">
+                  {question.options?.map(option => (
+                    <label key={option.value} className="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">
+                      <input type="checkbox" className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" checked={value.includes(option.value)} onChange={(e) => updateArrayField('mainConcerns', option.value, e.target.checked)} />
+                      <span className="ml-3 text-sm text-slate-700">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            );
+          default: return null;
+        }
+      };
+      
+      // --- From components/ResultsDisplay.tsx ---
+      const ActionItem = ({ text, subtext }) => (
+        <div className="flex items-start">
+            <CheckCircleIcon className="w-5 h-5 text-indigo-600 mr-3 mt-0.5 flex-shrink-0" />
+            <div>
+                <p className="font-medium text-slate-800">{text}</p>
+                <p className="text-sm text-slate-600">{subtext}</p>
+            </div>
+        </div>
+      );
+
+      const ResultsDisplay = ({ formData, recommendation, onStartOver }) => {
+        const currentSavings = parseFloat(formData.currentSavings) || 0;
+        const progressPercentage = recommendation.targetAmount > 0 ? Math.min(100, (currentSavings / recommendation.targetAmount) * 100) : 100;
+        const currencySymbol = getCurrencySymbol(formData.currency);
+
+        return (
+          <div className="space-y-6 animate-fade-in">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Your Emergency Fund Plan</h2>
+              <p className="text-slate-600">Based on your personal situation and risk factors.</p>
+            </div>
+            <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-200">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold text-indigo-900">Current Progress</h3>
+                <span className="text-2xl font-bold text-indigo-600">{progressPercentage.toFixed(0)}%</span>
+              </div>
+              <div className="w-full bg-indigo-200 rounded-full h-3 mb-2">
+                <div className="bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out" style={{ width: `${progressPercentage}%` }}></div>
+              </div>
+              <p className="text-sm text-indigo-700 text-center">{currencySymbol}{currentSavings.toLocaleString()} of {currencySymbol}{recommendation.targetAmount.toLocaleString()} target</p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                <div className="flex items-center mb-2"><TargetIcon className="w-5 h-5 text-emerald-600 mr-2" /><h4 className="font-semibold text-emerald-900">Target Amount</h4></div>
+                <p className="text-3xl font-bold text-emerald-600">{currencySymbol}{recommendation.targetAmount.toLocaleString()}</p>
+                <p className="text-sm text-emerald-700">{recommendation.monthsRecommended} months of essentials</p>
+              </div>
+              <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                <div className="flex items-center mb-2"><TrendingUpIcon className="w-5 h-5 text-amber-600 mr-2" /><h4 className="font-semibold text-amber-900">Time to Goal</h4></div>
+                <p className="text-3xl font-bold text-amber-600">{recommendation.monthsToTarget > 0 ? `${recommendation.monthsToTarget} months` : 'Goal reached!'}</p>
+                <p className="text-sm text-amber-700">At {currencySymbol}{recommendation.monthlyProgress.toLocaleString()}/month</p>
+              </div>
+            </div>
+            <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Action Plan</h3>
+              <div className="space-y-4">
+                {recommendation.remainingNeeded > 0 ? (
+                  <>
+                    <ActionItem text={`Save ${currencySymbol}${recommendation.remainingNeeded.toLocaleString()} more`} subtext={`At ${currencySymbol}${recommendation.monthlyProgress.toLocaleString()}/month, you'll reach your goal in ${recommendation.monthsToTarget} months.`} />
+                    <ActionItem text={`Store in a ${formData.storagePreference === 'savings' ? 'high-yield savings' : formData.storagePreference} account`} subtext="Keep it accessible but separate from daily spending." />
+                    <ActionItem text="Automate your savings" subtext="Set up automatic transfers on payday to build the habit." />
+                  </>
+                ) : (
+                  <div className="flex items-start">
+                    <CheckCircleIcon className="w-5 h-5 text-emerald-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-emerald-900">Congratulations! You've reached your emergency fund goal.</p>
+                      <p className="text-sm text-emerald-700">Focus on maintaining this amount and consider other financial goals.</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="mt-8 text-center">
+              <button onClick={onStartOver} className="px-8 py-2.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors font-medium">Start Over</button>
+            </div>
+          </div>
+        );
+      };
+
+      // --- From components/StepForm.tsx ---
+      const StepForm = ({ currentStep, formData, updateField, updateArrayField, prevStep, nextStep, isLastStep }) => {
+        const stepData = STEPS[currentStep];
+        return (
+          <div>
+            <ProgressBar currentStep={currentStep} totalSteps={STEPS.length} />
+            <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm mt-8">
+              <div className="flex items-center mb-6">
+                <div className="bg-indigo-100 p-3 rounded-lg mr-4">{stepData.icon}</div>
+                <h2 className="text-xl font-semibold text-slate-900">{stepData.title}</h2>
+              </div>
+              <div className="space-y-4">
+                {stepData.questions.map(question => (
+                  <QuestionRenderer key={question.key} question={question} formData={formData} updateField={updateField} updateArrayField={updateArrayField} />
+                ))}
+              </div>
+              <div className="flex justify-between items-center mt-8">
+                <button onClick={prevStep} disabled={currentStep === 0} className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium">Previous</button>
+                <button onClick={nextStep} className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{isLastStep ? 'Calculate Plan' : 'Next'}</button>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // --- From components/EmergencyFundPlanner.tsx ---
+      const EmergencyFundPlanner = () => {
+        const [currentStep, setCurrentStep] = useState(0);
+        const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+
+        const updateField = (field, value) => {
+          setFormData(prev => ({ ...prev, [field]: value }));
+        };
+
+        const updateArrayField = (field, value, checked) => {
+          setFormData(prev => ({
+            ...prev,
+            [field]: checked ? [...prev[field], value] : prev[field].filter(item => item !== value)
+          }));
+        };
+
+        const calculateRecommendation = useMemo(() => {
+          const essentials = parseFloat(formData.monthlyEssentials) || 0;
+          const currentSavings = parseFloat(formData.currentSavings) || 0;
+          const savingsCapacity = parseFloat(formData.monthlySavingsCapacity) || 0;
+          let baseMonths = 4;
+          if (formData.jobStability === 'very-stable') baseMonths -= 1;
+          if (formData.jobStability === 'unstable') baseMonths += 2;
+          if (formData.incomeStreams === 'multiple') baseMonths -= 0.5;
+          if (formData.incomeStreams === 'single') baseMonths += 0.5;
+          const dependentCount = parseInt(formData.dependents) || 0;
+          baseMonths += dependentCount * 0.5;
+          if (formData.mainConcerns.includes('medical')) baseMonths += 1;
+          if (formData.mainConcerns.includes('home-repair')) baseMonths += 0.5;
+          if (formData.familySupport === 'strong') baseMonths -= 1;
+          if (formData.familySupport === 'none') baseMonths += 1;
+          baseMonths = Math.max(3, Math.min(8, baseMonths));
+          const targetAmount = Math.round(essentials * baseMonths);
+          const remainingNeeded = Math.max(0, targetAmount - currentSavings);
+          const monthsToTarget = savingsCapacity > 0 ? Math.ceil(remainingNeeded / savingsCapacity) : 0;
+          return { targetAmount, monthsRecommended: baseMonths, remainingNeeded, monthsToTarget, monthlyProgress: savingsCapacity };
+        }, [formData]);
+
+        const nextStep = () => { if (currentStep < STEPS.length) setCurrentStep(currentStep + 1); };
+        const prevStep = () => { if (currentStep > 0) setCurrentStep(currentStep - 1); };
+        const startOver = () => {
+          setFormData(INITIAL_FORM_DATA);
+          setCurrentStep(0);
+        };
+
+        const isLastStep = currentStep === STEPS.length - 1;
+        const showResults = currentStep === STEPS.length;
+
+        return (
+          <div className="w-full max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
+            <div className="p-6 sm:p-10">
+              <header className="text-center mb-8">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Emergency Fund Planner</h1>
+                <p className="text-slate-500 max-w-2xl mx-auto">Build your financial safety net with a personalized plan.</p>
+              </header>
+              {showResults ? (
+                <ResultsDisplay formData={formData} recommendation={calculateRecommendation} onStartOver={startOver} />
+              ) : (
+                <StepForm currentStep={currentStep} formData={formData} updateField={updateField} updateArrayField={updateArrayField} prevStep={prevStep} nextStep={nextStep} isLastStep={isLastStep} />
+              )}
+            </div>
+          </div>
+        );
+      };
+
+      // --- From App.tsx ---
+      const App = () => {
+        return (
+          <main className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-slate-50 text-slate-800">
+            <EmergencyFundPlanner />
+          </main>
+        );
+      };
+
+      // --- From index.tsx ---
+      const rootElement = document.getElementById('root');
+      if (!rootElement) {
+        throw new Error("Could not find root element to mount to");
+      }
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(
+        <StrictMode>
+          <App />
+        </StrictMode>
+      );
+    </script>
   </body>
 </html>
