@@ -1,6 +1,7 @@
+
 import React from 'react';
-import type { StepData, QuestionOption } from './types';
-import { DollarSignIcon, AlertTriangleIcon, TargetIcon, TrendingUpIcon } from './components/Icons';
+import type { StepData, QuestionOption } from './types.ts';
+import { DollarSignIcon, AlertTriangleIcon, TargetIcon, TrendingUpIcon } from './components/Icons.tsx';
 
 export const ALL_CURRENCIES: (QuestionOption & { symbol: string })[] = [
   { value: 'AFN', label: 'Afghan Afghani', symbol: '؋' },

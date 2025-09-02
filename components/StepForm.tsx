@@ -1,9 +1,10 @@
 
+
 import React from 'react';
-import { STEPS } from '../constants';
-import type { FormData } from '../types';
-import QuestionRenderer from './QuestionRenderer';
-import ProgressBar from './ProgressBar';
+import { STEPS } from '../constants.tsx';
+import type { FormData } from '../types.ts';
+import QuestionRenderer from './QuestionRenderer.tsx';
+import ProgressBar from './ProgressBar.tsx';
 
 interface StepFormProps {
   currentStep: number;

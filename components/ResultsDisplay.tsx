@@ -1,7 +1,8 @@
+
 import React from 'react';
-import type { FormData, Recommendation } from '../types';
-import { TargetIcon, TrendingUpIcon, CheckCircleIcon } from './Icons';
-import { ALL_CURRENCIES } from '../constants';
+import type { FormData, Recommendation } from '../types.ts';
+import { TargetIcon, TrendingUpIcon, CheckCircleIcon } from './Icons.tsx';
+import { ALL_CURRENCIES } from '../constants.tsx';
 
 interface ResultsDisplayProps {
   formData: FormData;

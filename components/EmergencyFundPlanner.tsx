@@ -1,8 +1,9 @@
+
 import React, { useState, useMemo } from 'react';
-import type { FormData, Recommendation } from '../types';
-import { STEPS, INITIAL_FORM_DATA } from '../constants';
-import StepForm from './StepForm';
-import ResultsDisplay from './ResultsDisplay';
+import type { FormData, Recommendation } from '../types.ts';
+import { STEPS, INITIAL_FORM_DATA } from '../constants.tsx';
+import StepForm from './StepForm.tsx';
+import ResultsDisplay from './ResultsDisplay.tsx';
 
 const EmergencyFundPlanner: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);

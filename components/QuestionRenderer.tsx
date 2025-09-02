@@ -1,7 +1,8 @@
+
 import React from 'react';
-import type { Question, FormData } from '../types';
-import { ALL_CURRENCIES } from '../constants';
-import CurrencySelector from './CurrencySelector';
+import type { Question, FormData } from '../types.ts';
+import { ALL_CURRENCIES } from '../constants.tsx';
+import CurrencySelector from './CurrencySelector.tsx';
 
 interface QuestionRendererProps {
   question: Question;

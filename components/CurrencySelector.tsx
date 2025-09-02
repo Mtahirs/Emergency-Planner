@@ -1,6 +1,7 @@
+
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { ALL_CURRENCIES } from '../constants';
-import { SearchIcon, ChevronDownIcon } from './Icons';
+import { ALL_CURRENCIES } from '../constants.tsx';
+import { SearchIcon, ChevronDownIcon } from './Icons.tsx';
 
 interface CurrencySelectorProps {
   value: string;

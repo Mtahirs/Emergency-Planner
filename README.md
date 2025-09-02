@@ -1,20 +1,19 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Emergency Fund Planner
 
-# Run and deploy your AI Studio app
+A personalized financial planning tool to help you build a robust financial safety net. Answer a few questions about your finances, risk factors, and personal situation to receive a tailored recommendation for your emergency fund target and an actionable plan to achieve your goal.
 
-This contains everything you need to run your app locally.
+## Live Demo
 
-View your app in AI Studio: https://ai.studio/apps/drive/1u45fHhpTjtT6GuEqCyJP_QtiXs-nKzxF
+This project is ready to be deployed on GitHub Pages.
 
-## Run Locally
+## How to Deploy to GitHub Pages
 
-**Prerequisites:**  Node.js
+1.  **Create a new repository** on GitHub.
+2.  **Push the project files** (`index.html`, `index.tsx`, `App.tsx`, etc.) to the repository.
+3.  Go to your repository's **Settings** page.
+4.  In the left sidebar, click on **Pages**.
+5.  Under "Build and deployment", for the **Source**, select **Deploy from a branch**.
+6.  Select the `main` (or `master`) branch and the `/ (root)` folder. Click **Save**.
+7.  GitHub will build and deploy your site. It might take a few minutes. The URL will be available on the same page.
 
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+This project uses [Babel Standalone](https://babeljs.io/docs/en/babel-standalone) to transpile JSX directly in the browser. This is great for simple projects and demos but is not recommended for production applications due to performance considerations. For a production build, you would typically use a build tool like [Vite](https://vitejs.dev/) or [Create React App](https://create-react-app.dev/).

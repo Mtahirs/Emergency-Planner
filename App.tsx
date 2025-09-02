@@ -1,6 +1,6 @@
 
 import React from 'react';
-import EmergencyFundPlanner from './components/EmergencyFundPlanner';
+import EmergencyFundPlanner from './components/EmergencyFundPlanner.tsx';
 
 const App: React.FC = () => {
   return (
